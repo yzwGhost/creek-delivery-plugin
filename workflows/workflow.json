@@ -1,0 +1,132 @@
+{
+  "version": "1.0.0",
+  "roles": [
+    "orchestrator",
+    "design",
+    "qa-design",
+    "backend",
+    "frontend",
+    "qa",
+    "sync"
+  ],
+  "entry": "intake",
+  "stages": [
+    {
+      "id": "intake",
+      "role": "design",
+      "dependencies": [],
+      "artifact": "sources",
+      "pause": "输入缺失、冲突或环境不可用时只阻塞受影响项"
+    },
+    {
+      "id": "plan",
+      "role": "design",
+      "dependencies": [
+        "intake"
+      ],
+      "artifact": "tasks",
+      "pause": "输入缺失、冲突或环境不可用时只阻塞受影响项"
+    },
+    {
+      "id": "cases",
+      "role": "qa-design",
+      "dependencies": [
+        "plan"
+      ],
+      "artifact": "matrix",
+      "pause": "输入缺失、冲突或环境不可用时只阻塞受影响项"
+    },
+    {
+      "id": "backend",
+      "role": "backend",
+      "dependencies": [
+        "plan"
+      ],
+      "artifact": "routes",
+      "pause": "输入缺失、冲突或环境不可用时只阻塞受影响项"
+    },
+    {
+      "id": "frontend",
+      "role": "frontend",
+      "dependencies": [
+        "plan"
+      ],
+      "artifact": "pages",
+      "pause": "输入缺失、冲突或环境不可用时只阻塞受影响项"
+    },
+    {
+      "id": "integration",
+      "role": "qa",
+      "dependencies": [
+        "frontend",
+        "backend"
+      ],
+      "artifact": "checks",
+      "pause": "输入缺失、冲突或环境不可用时只阻塞受影响项"
+    },
+    {
+      "id": "acceptance",
+      "role": "qa",
+      "dependencies": [
+        "integration",
+        "cases"
+      ],
+      "artifact": "results",
+      "pause": "输入缺失、冲突或环境不可用时只阻塞受影响项"
+    },
+    {
+      "id": "regression",
+      "role": "qa",
+      "dependencies": [
+        "acceptance"
+      ],
+      "artifact": "regressions",
+      "pause": "输入缺失、冲突或环境不可用时只阻塞受影响项"
+    },
+    {
+      "id": "case-confirm",
+      "role": "orchestrator",
+      "dependencies": [
+        "cases"
+      ],
+      "artifact": "case-approval",
+      "pause": "等待完整清单确认"
+    },
+    {
+      "id": "case-sync",
+      "role": "sync",
+      "dependencies": [
+        "case-confirm"
+      ],
+      "artifact": "case-mapping",
+      "pause": "能力、权限或远端结果待核查"
+    },
+    {
+      "id": "defect-confirm",
+      "role": "orchestrator",
+      "dependencies": [
+        "regression"
+      ],
+      "artifact": "defect-approval",
+      "pause": "等待完整清单确认"
+    },
+    {
+      "id": "defect-sync",
+      "role": "sync",
+      "dependencies": [
+        "defect-confirm"
+      ],
+      "artifact": "defect-mapping",
+      "pause": "能力、权限或远端结果待核查"
+    },
+    {
+      "id": "delivery",
+      "role": "orchestrator",
+      "dependencies": [
+        "regression"
+      ],
+      "artifact": "report",
+      "pause": "输入缺失、冲突或环境不可用时只阻塞受影响项"
+    }
+  ]
+}

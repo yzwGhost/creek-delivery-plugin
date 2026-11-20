@@ -1,0 +1,20 @@
+{
+  "name": "creek-delivery-local",
+  "interface": {
+    "displayName": "Creek Local"
+  },
+  "plugins": [
+    {
+      "name": "creek-delivery",
+      "source": {
+        "source": "local",
+        "path": "."
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_USE"
+      },
+      "category": "Developer Tools"
+    }
+  ]
+}
