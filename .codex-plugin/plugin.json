@@ -1,6 +1,6 @@
 {
   "name": "creek-delivery",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "根据需求、接口和原型调度多 Agent 完成开发与验收。",
   "skills": "./skills/",
   "interface": {

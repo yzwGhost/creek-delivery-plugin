@@ -4,6 +4,7 @@ import difflib
 import hashlib
 import json
 import os
+from datetime import datetime, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -77,9 +78,14 @@ def bundle():
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("action", choices=["check", "start", "resume", "diff", "migrate"])
+    parser.add_argument("action", choices=["check", "start", "resume", "diff", "migrate", "update", "status"])
     parser.add_argument("batch", nargs="?", type=Path)
     parser.add_argument("--confirmed-diff")
+    parser.add_argument("--stage")
+    parser.add_argument("--status", choices=["pending", "running", "done", "failed", "blocked", "skipped"])
+    parser.add_argument("--reason", default="")
+    parser.add_argument("--owner", default="")
+    parser.add_argument("--artifact", default="")
     args = parser.parse_args()
     if args.action == "check":
         bundle()
@@ -101,6 +107,22 @@ def main():
         old = (path / previous).read_text(encoding="utf8")
         if hashlib.sha256(old.encode()).hexdigest() != previous:
             raise ValueError("Snapshot integrity failure")
+        if args.action in ("update", "status"):
+            state_path = path / "stages.json"
+            stages = {s["id"]: {"status": "pending"} for s in json.loads(old)["workflow"]["stages"]}
+            state = json.loads(state_path.read_text(encoding="utf8")) if state_path.exists() else {"stages": stages}
+            if args.action == "status":
+                print(json.dumps(state, ensure_ascii=False, indent=2))
+                return
+            if not args.stage or args.stage not in stages or not args.status:
+                parser.error("Valid --stage and --status required")
+            if args.status in ("skipped", "blocked", "failed") and not args.reason.strip():
+                parser.error("--reason required for skipped, blocked or failed")
+            state["stages"][args.stage] = {"status": args.status, "reason": args.reason, "owner": args.owner, "artifact": args.artifact, "updated_at": datetime.now(timezone.utc).isoformat()}
+            temp = path / "stages.json.tmp"
+            temp.write_text(json.dumps(state, ensure_ascii=False, indent=2), encoding="utf8")
+            os.replace(temp, state_path)
+            return
         if args.action == "resume":
             print(old)
             return

@@ -6,7 +6,7 @@
 
 本机 Codex CLI 通过 `codex plugin marketplace add <本地市场目录>` 注册市场，随后通过 `codex plugin add creek-delivery@<市场名>` 安装市场已登记的插件。本会话的已加载技能目录未列出本插件。需要由包含此插件的市场安装并在新会话验证调用。
 
-本机提供 Agent 调度与交接工具。本会话未发现云效用例或缺陷工具，云效同步保持待连接。Ant Design CLI 已安装，默认 Node 14 解析其代码时失败，使用本机 Node 20.19.0 运行 CLI。
+运行前检查 Agent 调度、云效连接、权限和 Ant Design 工具；不可用时记录阻塞及恢复条件。云效写入前展示完整清单并取得确认。
 
 本机 Windows 可在插件目录使用 Codex 自带 Python 运行测试和配置检查：
 

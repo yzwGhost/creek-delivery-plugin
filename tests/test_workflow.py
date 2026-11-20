@@ -14,6 +14,17 @@ import workflow
 
 
 class WorkflowTests(unittest.TestCase):
+    def test_stage_status_persists_and_skip_requires_reason(self):
+        with tempfile.TemporaryDirectory() as folder:
+            batch = Path(folder) / "batch"
+            self.run_cli("start", batch)
+            self.run_cli("update", batch, "--stage", "backend", "--status", "skipped", "--reason", "纯前端需求")
+            state = json.loads((batch / "stages.json").read_text(encoding="utf8"))
+            self.assertEqual(state["stages"]["backend"]["reason"], "纯前端需求")
+            self.assertEqual(state["stages"]["backend"]["status"], "skipped")
+            with contextlib.redirect_stderr(io.StringIO()), self.assertRaises(SystemExit):
+                self.run_cli("update", batch, "--stage", "frontend", "--status", "skipped")
+
     def test_test_document_templates_are_snapshotted_and_required(self):
         snapshot = json.loads(workflow.bundle())
         for name in ("测试计划模板.md", "测试用例模板.md", "需求与资料核对表模板.md", "缺陷记录与回归表模板.md"):
